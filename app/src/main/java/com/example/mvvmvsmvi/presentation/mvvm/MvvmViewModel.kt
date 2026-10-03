@@ -2,8 +2,8 @@ package com.example.mvvmvsmvi.presentation.mvvm
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mvvmvsmvi.domain.LoadTasks
-import com.example.mvvmvsmvi.domain.ToggleTask
+import com.example.mvvmvsmvi.domain.usecase.LoadTasksUseCase
+import com.example.mvvmvsmvi.domain.usecase.ToggleTaskUseCase
 import com.example.mvvmvsmvi.presentation.tasks.TasksState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,8 +12,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MvvmViewModel(
-    private val loadTasks: LoadTasks,
-    private val toggleTask: ToggleTask = ToggleTask(),
+    private val loadTasks: LoadTasksUseCase,
+    private val toggleTask: ToggleTaskUseCase = ToggleTaskUseCase(),
 ) : ViewModel() {
     private val mutableState = MutableStateFlow(TasksState())
     val state = mutableState.asStateFlow()

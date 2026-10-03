@@ -1,7 +1,11 @@
 package com.example.mvvmvsmvi
 
 import com.example.mvvmvsmvi.data.FakeTaskRepository
-import com.example.mvvmvsmvi.domain.*
+import com.example.mvvmvsmvi.domain.entity.Task
+import com.example.mvvmvsmvi.domain.entity.TaskTitle
+import com.example.mvvmvsmvi.domain.repository.TaskRepository
+import com.example.mvvmvsmvi.domain.usecase.LoadTasksUseCase
+import com.example.mvvmvsmvi.domain.usecase.ToggleTaskUseCase
 import com.example.mvvmvsmvi.presentation.mvi.*
 import com.example.mvvmvsmvi.presentation.tasks.TasksState
 import kotlinx.coroutines.test.runTest
@@ -16,18 +20,18 @@ class DomainAndRepositoryTest {
         val repository = object : TaskRepository {
             override suspend fun loadTasks(): List<Task> { calls++; return expected }
         }
-        assertEquals(expected, LoadTasks(repository)())
+        assertEquals(expected, LoadTasksUseCase(repository)())
         assertEquals(1, calls)
     }
 
     @Test fun toggleIsImmutableAndUnknownIdIsHarmless() {
         val original = listOf(Task("a", TaskTitle.TESTS), Task("b", TaskTitle.COMPOSE))
-        val updated = ToggleTask()(original, "a")
+        val updated = ToggleTaskUseCase()(original, "a")
         assertFalse(original.first().completed)
         assertTrue(updated.first().completed)
         assertEquals(original.last(), updated.last())
-        assertEquals(original, ToggleTask()(original, "missing"))
-        assertTrue(ToggleTask()(emptyList(), "missing").isEmpty())
+        assertEquals(original, ToggleTaskUseCase()(original, "missing"))
+        assertTrue(ToggleTaskUseCase()(emptyList(), "missing").isEmpty())
     }
 
     @Test fun fakeFailsEveryThirdLoadAndRecoversWithFreshData() = runTest {

@@ -1,6 +1,6 @@
 package com.example.mvvmvsmvi.presentation.tasks
 
-import com.example.mvvmvsmvi.domain.Task
+import com.example.mvvmvsmvi.domain.entity.Task
 
 data class TasksState(
     val tasks: List<Task> = emptyList(),

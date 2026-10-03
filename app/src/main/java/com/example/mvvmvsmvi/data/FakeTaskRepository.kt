@@ -1,8 +1,8 @@
 package com.example.mvvmvsmvi.data
 
-import com.example.mvvmvsmvi.domain.Task
-import com.example.mvvmvsmvi.domain.TaskRepository
-import com.example.mvvmvsmvi.domain.TaskTitle
+import com.example.mvvmvsmvi.domain.entity.Task
+import com.example.mvvmvsmvi.domain.repository.TaskRepository
+import com.example.mvvmvsmvi.domain.entity.TaskTitle
 import kotlinx.coroutines.delay
 import java.io.IOException
 

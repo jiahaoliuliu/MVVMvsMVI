@@ -16,8 +16,8 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mvvmvsmvi.R
-import com.example.mvvmvsmvi.domain.Task
-import com.example.mvvmvsmvi.domain.TaskTitle
+import com.example.mvvmvsmvi.domain.entity.Task
+import com.example.mvvmvsmvi.domain.entity.TaskTitle
 
 /** Both architectures render this exact production composable. */
 @Composable

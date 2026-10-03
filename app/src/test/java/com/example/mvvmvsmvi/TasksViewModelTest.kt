@@ -3,10 +3,10 @@ package com.example.mvvmvsmvi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
-import com.example.mvvmvsmvi.domain.LoadTasks
-import com.example.mvvmvsmvi.domain.Task
-import com.example.mvvmvsmvi.domain.TaskRepository
-import com.example.mvvmvsmvi.domain.TaskTitle
+import com.example.mvvmvsmvi.domain.usecase.LoadTasksUseCase
+import com.example.mvvmvsmvi.domain.entity.Task
+import com.example.mvvmvsmvi.domain.repository.TaskRepository
+import com.example.mvvmvsmvi.domain.entity.TaskTitle
 import com.example.mvvmvsmvi.presentation.mvi.MviViewModel
 import com.example.mvvmvsmvi.presentation.mvi.TasksIntent
 import com.example.mvvmvsmvi.presentation.mvvm.MvvmViewModel
@@ -137,14 +137,14 @@ abstract class TasksViewModelContract {
 
 class MvvmViewModelTest : TasksViewModelContract() {
     override fun create(repository: TaskRepository): Harness {
-        val model = retain(MvvmViewModel(LoadTasks(repository)), MvvmViewModel::class.java)
+        val model = retain(MvvmViewModel(LoadTasksUseCase(repository)), MvvmViewModel::class.java)
         return Harness(model.state, model::refresh, model::toggle)
     }
 }
 
 class MviViewModelTest : TasksViewModelContract() {
     override fun create(repository: TaskRepository): Harness {
-        val model = retain(MviViewModel(LoadTasks(repository)), MviViewModel::class.java)
+        val model = retain(MviViewModel(LoadTasksUseCase(repository)), MviViewModel::class.java)
         return Harness(model.state, { model.accept(TasksIntent.Refresh) }, { model.accept(TasksIntent.Toggle(it)) })
     }
 }

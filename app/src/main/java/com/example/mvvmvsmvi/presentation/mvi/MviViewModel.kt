@@ -2,9 +2,9 @@ package com.example.mvvmvsmvi.presentation.mvi
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mvvmvsmvi.domain.LoadTasks
-import com.example.mvvmvsmvi.domain.Task
-import com.example.mvvmvsmvi.domain.ToggleTask
+import com.example.mvvmvsmvi.domain.usecase.LoadTasksUseCase
+import com.example.mvvmvsmvi.domain.entity.Task
+import com.example.mvvmvsmvi.domain.usecase.ToggleTaskUseCase
 import com.example.mvvmvsmvi.presentation.tasks.TasksState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
@@ -30,10 +30,10 @@ fun reduce(state: TasksState, result: TasksResult): TasksState = when (result) {
     TasksResult.Loading -> state.copy(isLoading = true, hasError = false)
     is TasksResult.Loaded -> TasksState(tasks = result.tasks)
     TasksResult.Failed -> state.copy(isLoading = false, hasError = true)
-    is TasksResult.Toggled -> state.copy(tasks = ToggleTask()(state.tasks, result.id))
+    is TasksResult.Toggled -> state.copy(tasks = ToggleTaskUseCase()(state.tasks, result.id))
 }
 
-class MviViewModel(private val loadTasks: LoadTasks) : ViewModel() {
+class MviViewModel(private val loadTasks: LoadTasksUseCase) : ViewModel() {
     private val mutableState = MutableStateFlow(TasksState())
     val state = mutableState.asStateFlow()
     private val intents = Channel<TasksIntent>(Channel.UNLIMITED)

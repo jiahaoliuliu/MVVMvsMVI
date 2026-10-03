@@ -10,7 +10,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.mvvmvsmvi.data.FakeTaskRepository
-import com.example.mvvmvsmvi.domain.LoadTasks
+import com.example.mvvmvsmvi.domain.usecase.LoadTasksUseCase
 import com.example.mvvmvsmvi.presentation.tasks.TasksScreen
 
 class MvvmActivity : ComponentActivity() {
@@ -19,7 +19,7 @@ class MvvmActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val model: MvvmViewModel = viewModel(factory = viewModelFactory {
-                initializer { MvvmViewModel(LoadTasks(FakeTaskRepository())) }
+                initializer { MvvmViewModel(LoadTasksUseCase(FakeTaskRepository())) }
             })
             MaterialTheme {
                 TasksScreen(

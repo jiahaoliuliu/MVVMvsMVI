@@ -63,7 +63,14 @@ An explicit reducer makes transitions easy to test and inspect, but introduces m
 ```text
 app/src/main/java/com/example/mvvmvsmvi/
 ├── domain/
-│   └── Task.kt                 # Model, repository contract, load/toggle use cases
+│   ├── entity/
+│   │   ├── Task.kt             # Task model
+│   │   └── TaskTitle.kt        # Task title keys
+│   ├── repository/
+│   │   └── TaskRepository.kt   # Repository contract
+│   └── usecase/
+│       ├── LoadTasksUseCase.kt # Load use case
+│       └── ToggleTaskUseCase.kt # Toggle use case
 ├── data/
 │   └── FakeTaskRepository.kt   # Delayed, deterministic implementation
 └── presentation/
