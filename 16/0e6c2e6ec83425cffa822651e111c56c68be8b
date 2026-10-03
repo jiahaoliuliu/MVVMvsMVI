@@ -1,0 +1,47 @@
+app/src/main/java/com/example/mvvmvsmvi/domain/entity/TaskTitle.kt
+  s_ed2cef3c00f83c::t_7bd7a3f3657660 1-3
+app/src/main/java/com/example/mvvmvsmvi/presentation/mvvm/MvvmActivity.kt
+  s_ed2cef3c00f83c::t_7bd7a3f3657660 13,22
+app/src/main/java/com/example/mvvmvsmvi/domain/repository/TaskRepository.kt
+  s_ed2cef3c00f83c::t_7bd7a3f3657660 1-7
+app/src/test/java/com/example/mvvmvsmvi/DomainAndRepositoryTest.kt
+  s_ed2cef3c00f83c::t_7bd7a3f3657660 4-8,23,29,33-34
+app/src/main/java/com/example/mvvmvsmvi/data/FakeTaskRepository.kt
+  s_ed2cef3c00f83c::t_7bd7a3f3657660 3-5
+app/src/main/java/com/example/mvvmvsmvi/presentation/mvi/MviActivity.kt
+  s_ed2cef3c00f83c::t_7bd7a3f3657660 13,22
+README.md
+  s_ed2cef3c00f83c::t_7bd7a3f3657660 66-73
+app/src/main/java/com/example/mvvmvsmvi/domain/usecase/LoadTasksUseCase.kt
+  s_ed2cef3c00f83c::t_7bd7a3f3657660 1-8
+app/src/main/java/com/example/mvvmvsmvi/presentation/mvvm/MvvmViewModel.kt
+  s_ed2cef3c00f83c::t_7bd7a3f3657660 5-6,15-16
+app/src/main/java/com/example/mvvmvsmvi/domain/usecase/ToggleTaskUseCase.kt
+  s_ed2cef3c00f83c::t_7bd7a3f3657660 1,3,5
+app/src/main/java/com/example/mvvmvsmvi/presentation/tasks/TasksScreen.kt
+  s_ed2cef3c00f83c::t_7bd7a3f3657660 19-20
+app/src/test/java/com/example/mvvmvsmvi/TasksViewModelTest.kt
+  s_ed2cef3c00f83c::t_7bd7a3f3657660 6-9,140,147
+app/src/main/java/com/example/mvvmvsmvi/presentation/mvi/MviViewModel.kt
+  s_ed2cef3c00f83c::t_7bd7a3f3657660 5-7,33,36
+app/src/main/java/com/example/mvvmvsmvi/domain/entity/Task.kt
+  s_ed2cef3c00f83c::t_7bd7a3f3657660 1-3
+app/src/main/java/com/example/mvvmvsmvi/presentation/tasks/TasksState.kt
+  s_ed2cef3c00f83c::t_7bd7a3f3657660 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "160e6c2e6ec83425cffa822651e111c56c68be8b",
+  "prompts": {},
+  "sessions": {
+    "s_ed2cef3c00f83c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a10154-c5af-76f3-b552-64405031152a",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jiahao Liu Liu <jiahaoliuliu@gmail.com>"
+    }
+  }
+}
