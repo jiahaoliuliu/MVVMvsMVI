@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">MVVM vs MVI</string>
+    <string name="choose_architecture">Choose an architecture</string>
+    <string name="intro">Explore the same task list built with two Android architectures. Toggle tasks, refresh, and try error recovery to compare their behavior.</string>
+    <string name="mvvm_explanation">MVVM (Model–View–ViewModel): the UI calls ViewModel methods, which load data and update the screen state.</string>
+    <string name="mvi_explanation">MVI (Model–View–Intent): the UI sends explicit intents. A processor handles them, and a reducer turns results into screen state.</string>
+    <string name="shared_explanation">Both examples use a ViewModel and one state stream. The difference here is how actions and state transitions are organized.</string>
+    <string name="back">Back</string>
+    <string name="open_mvvm">Open MVVM</string><string name="open_mvi">Open MVI</string>
+    <string name="tasks_title">My tasks</string><string name="refresh">Refresh</string>
+    <string name="retry">Retry</string><string name="loading">Loading tasks</string>
+    <string name="load_error">Could not load tasks. Please retry.</string>
+    <string name="completed_count">Completed: %1$d of %2$d</string>
+    <string name="demo_hint">Every third load fails so you can try error recovery. Refresh resets completion.</string>
+    <string name="task_compose">Learn Jetpack Compose</string>
+    <string name="task_compare">Compare MVVM and MVI</string>
+    <string name="task_tests">Write useful tests</string>
+</resources>
