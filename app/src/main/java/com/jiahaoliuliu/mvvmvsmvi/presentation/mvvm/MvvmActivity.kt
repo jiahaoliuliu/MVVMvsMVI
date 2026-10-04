@@ -21,17 +21,22 @@ class MvvmActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val model: MvvmViewModel = viewModel(factory = viewModelFactory {
+            val viewModel: MvvmViewModel = viewModel(factory = viewModelFactory {
                 initializer {
-                    val repository = FakeTaskRepository(TaskCompletionStore(applicationContext.taskCompletionDataStore))
-                    MvvmViewModel(LoadTasksUseCase(repository), ToggleTaskUseCase(repository))
+                    val repository = FakeTaskRepository(
+                        completionStore = TaskCompletionStore(applicationContext.taskCompletionDataStore)
+                    )
+                    MvvmViewModel(
+                        loadTaskUseCase = LoadTasksUseCase(repository),
+                        toggleTaskUseCase = ToggleTaskUseCase(repository),
+                    )
                 }
             })
             MaterialTheme {
                 TasksScreen(
-                    state = model.state.collectAsStateWithLifecycle().value,
-                    onRefresh = model::refresh,
-                    onToggle = model::toggle,
+                    state = viewModel.state.collectAsStateWithLifecycle().value,
+                    onRefresh = viewModel::refresh,
+                    onToggle = viewModel::toggle,
                     onBack = onBackPressedDispatcher::onBackPressed,
                 )
             }

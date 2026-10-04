@@ -23,16 +23,47 @@ class MainActivity : ComponentActivity() {
         setContent {
             MaterialTheme {
                 Surface(Modifier.fillMaxSize()) {
-                    Column(Modifier.safeDrawingPadding().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                        Text(stringResource(R.string.choose_architecture), style = MaterialTheme.typography.headlineLarge)
+                    Column(
+                        Modifier
+                            .safeDrawingPadding()
+                            .verticalScroll(rememberScrollState())
+                            .padding(24.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            stringResource(R.string.choose_architecture),
+                            style = MaterialTheme.typography.headlineLarge
+                        )
                         Text(stringResource(R.string.intro))
                         Text(stringResource(R.string.mvvm_explanation))
                         Text(stringResource(R.string.mvi_explanation))
-                        Text(stringResource(R.string.shared_explanation), style = MaterialTheme.typography.bodySmall)
-                        Button(modifier = Modifier.fillMaxWidth(), onClick = { startActivity(Intent(this@MainActivity, MvvmActivity::class.java)) }) {
+                        Text(
+                            stringResource(R.string.shared_explanation),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = {
+                                startActivity(
+                                    Intent(
+                                        this@MainActivity,
+                                        MvvmActivity::class.java
+                                    )
+                                )
+                            }
+                        ) {
                             Text(stringResource(R.string.open_mvvm))
                         }
-                        Button(modifier = Modifier.fillMaxWidth(), onClick = { startActivity(Intent(this@MainActivity, MviActivity::class.java)) }) {
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = {
+                                startActivity(
+                                    Intent(
+                                        this@MainActivity,
+                                        MviActivity::class.java
+                                    )
+                                )
+                            }) {
                             Text(stringResource(R.string.open_mvi))
                         }
                     }

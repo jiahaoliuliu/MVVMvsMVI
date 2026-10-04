@@ -12,20 +12,22 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MvvmViewModel(
-    private val loadTasks: LoadTasksUseCase,
-    private val toggleTask: ToggleTaskUseCase,
+    private val loadTaskUseCase: LoadTasksUseCase,
+    private val toggleTaskUseCase: ToggleTaskUseCase,
 ) : ViewModel() {
     private val mutableState = MutableStateFlow(TasksState())
     val state = mutableState.asStateFlow()
 
-    init { refresh() }
+    init {
+        refresh()
+    }
 
     fun refresh() {
         if (state.value.isLoading || state.value.isSaving) return
         mutableState.update { it.copy(isLoading = true, hasError = false, hasSaveError = false) }
         viewModelScope.launch {
             try {
-                val tasks = loadTasks()
+                val tasks = loadTaskUseCase()
                 mutableState.value = TasksState(tasks = tasks)
             } catch (cancelled: CancellationException) {
                 throw cancelled
@@ -40,9 +42,11 @@ class MvvmViewModel(
         mutableState.update { it.copy(isSaving = true, hasSaveError = false) }
         viewModelScope.launch {
             try {
-                val saved = toggleTask(id)
+                val saved = toggleTaskUseCase(id)
                 mutableState.update { state ->
-                    state.copy(isSaving = false, tasks = state.tasks.map { if (saved != null && it.id == saved.id) saved else it })
+                    state.copy(
+                        isSaving = false,
+                        tasks = state.tasks.map { if (saved != null && it.id == saved.id) saved else it })
                 }
             } catch (cancelled: CancellationException) {
                 throw cancelled

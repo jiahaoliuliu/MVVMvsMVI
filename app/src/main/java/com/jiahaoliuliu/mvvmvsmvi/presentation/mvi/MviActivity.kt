@@ -23,7 +23,8 @@ class MviActivity : ComponentActivity() {
         setContent {
             val model: MviViewModel = viewModel(factory = viewModelFactory {
                 initializer {
-                    val repository = FakeTaskRepository(TaskCompletionStore(applicationContext.taskCompletionDataStore))
+                    val repository =
+                        FakeTaskRepository(TaskCompletionStore(applicationContext.taskCompletionDataStore))
                     MviViewModel(LoadTasksUseCase(repository), ToggleTaskUseCase(repository))
                 }
             })

@@ -30,12 +30,23 @@ fun TasksScreen(
 ) {
     val savingLabel = stringResource(R.string.saving)
     Surface(modifier = Modifier.fillMaxSize()) {
-        Column(Modifier.safeDrawingPadding().padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Column(
+            Modifier
+                .safeDrawingPadding()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onBack) {
-                    Icon(painterResource(R.drawable.ic_arrow_back), contentDescription = stringResource(R.string.back))
+                    Icon(
+                        painterResource(R.drawable.ic_arrow_back),
+                        contentDescription = stringResource(R.string.back)
+                    )
                 }
-                Text(stringResource(R.string.tasks_title), style = MaterialTheme.typography.headlineLarge)
+                Text(
+                    stringResource(R.string.tasks_title),
+                    style = MaterialTheme.typography.headlineLarge
+                )
             }
             Text(
                 stringResource(R.string.demo_hint),
@@ -44,7 +55,10 @@ fun TasksScreen(
             )
             if (state.isLoading) {
                 Box(
-                    modifier = Modifier.weight(1f).fillMaxWidth().testTag("loading_area"),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .testTag("loading_area"),
                     contentAlignment = Alignment.Center,
                 ) {
                     val loading = stringResource(R.string.loading)
@@ -59,32 +73,54 @@ fun TasksScreen(
                 }
             } else {
                 LazyColumn(
-                    modifier = Modifier.weight(1f).fillMaxWidth().testTag("tasks_list"),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .testTag("tasks_list"),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     item {
                         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                            Text(stringResource(R.string.completed_count, state.tasks.count { it.completed }, state.tasks.size))
+                            Text(
+                                stringResource(
+                                    R.string.completed_count,
+                                    state.tasks.count { it.completed },
+                                    state.tasks.size
+                                )
+                            )
                             if (state.hasSaveError) {
-                                Text(stringResource(R.string.save_error), color = MaterialTheme.colorScheme.error)
+                                Text(
+                                    stringResource(R.string.save_error),
+                                    color = MaterialTheme.colorScheme.error
+                                )
                             }
                             if (state.hasError) {
-                                Text(stringResource(R.string.load_error), color = MaterialTheme.colorScheme.error)
-                                Button(onClick = onRefresh, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.retry)) }
+                                Text(
+                                    stringResource(R.string.load_error),
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                                Button(
+                                    onClick = onRefresh,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) { Text(stringResource(R.string.retry)) }
                             }
                         }
                     }
                     items(state.tasks, key = { it.id }) { task ->
                         Card {
                             Row(
-                                Modifier.fillMaxWidth().toggleable(
-                                    value = task.completed,
-                                    enabled = !state.isLoading && !state.isSaving,
-                                    role = Role.Checkbox,
-                                    onValueChange = { onToggle(task.id) },
-                                ).semantics {
-                                    if (state.isSaving) stateDescription = savingLabel
-                                }.padding(12.dp),
+                                Modifier
+                                    .fillMaxWidth()
+                                    .toggleable(
+                                        value = task.completed,
+                                        enabled = !state.isLoading && !state.isSaving,
+                                        role = Role.Checkbox,
+                                        onValueChange = { onToggle(task.id) },
+                                    )
+                                    .semantics {
+                                        if (state.isSaving) stateDescription = savingLabel
+                                    }
+                                    .padding(12.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Checkbox(

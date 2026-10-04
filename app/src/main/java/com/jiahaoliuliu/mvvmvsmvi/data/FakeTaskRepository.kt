@@ -5,6 +5,7 @@ import com.jiahaoliuliu.mvvmvsmvi.domain.entity.TaskTitle
 import com.jiahaoliuliu.mvvmvsmvi.domain.repository.TaskRepository
 import kotlinx.coroutines.delay
 import java.io.IOException
+import kotlin.time.Duration.Companion.milliseconds
 
 /** Fake task catalog with real DataStore persistence for completion. */
 class FakeTaskRepository(
@@ -19,7 +20,7 @@ class FakeTaskRepository(
     )
 
     override suspend fun loadTasks(): List<Task> {
-        delay(delayMillis)
+        delay(delayMillis.milliseconds)
         loadCount++
         if (loadCount % 3 == 0) throw IOException("Demonstration load failure")
         val completed = completionStore.completedTaskIds()

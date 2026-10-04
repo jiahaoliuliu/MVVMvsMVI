@@ -37,6 +37,7 @@ fun reduce(state: TasksState, result: TasksResult): TasksState = when (result) {
         isSaving = false,
         tasks = state.tasks.map { if (result.task != null && it.id == result.task.id) result.task else it },
     )
+
     TasksResult.SaveFailed -> state.copy(isSaving = false, hasSaveError = true)
 }
 
@@ -92,5 +93,7 @@ class MviViewModel(
         }
     }
 
-    override fun onCleared() { intents.close() }
+    override fun onCleared() {
+        intents.close()
+    }
 }
