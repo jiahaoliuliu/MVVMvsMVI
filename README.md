@@ -2,7 +2,7 @@
 
 A small Kotlin / Jetpack Compose application for comparing **Model–View–ViewModel (MVVM)** with **Model–View–Intent (MVI)**. The launcher briefly explains both approaches and offers full-width buttons to choose an implementation. Both activities render the **same production composable**, use the same domain use cases and fake repository implementation, and offer identical behavior.
 
-The example is deliberately small enough to read alongside a blog post. No backend, credentials, dependency injection framework, or network permission is required.
+The example is deliberately small enough to read alongside a blog post. No backend, credentials, dependency injection framework, or network permission is required. The app namespace and application ID are `com.jiahaoliuliu.mvvmvsmvi`.
 
 ## Try it
 
@@ -12,9 +12,9 @@ The example is deliberately small enough to read alongside a blog post. No backe
 4. Choose **Open MVVM** or **Open MVI**.
 5. Toggle a task, refresh, and compare the code handling those actions.
 
-Each activity owns a fresh fake repository, retained by its ViewModel across configuration changes. Load 1 succeeds automatically, load 2 succeeds on refresh, and load 3 fails. **Retry** runs load 4 and succeeds. Every third load fails. Failed refreshes retain the existing tasks; successful refreshes restore the original, incomplete tasks. Inputs are disabled during loading. The top back button and System Back return to the chooser.
+Each activity owns a fresh fake repository, retained by its ViewModel across configuration changes. Load 1 succeeds automatically, load 2 succeeds on refresh, and load 3 fails. **Retry** runs load 4 and succeeds. Every third load fails. Failed refreshes retain the existing tasks; successful refreshes reload the catalog with completion restored from DataStore. Task toggles and refresh are disabled while loading or saving. The top back button and System Back return to the chooser.
 
-Task completion is intentionally session-local. Rotation preserves it; process death or reopening an activity starts a new scenario. There is no database or saved-state restoration in this sample.
+Task completion is stored in **Preferences DataStore**, shared by both architectures. Confirmed choices survive activity reopening and app/process restarts. Only the fake load counter resets when reopening a screen. The repository stores completed task IDs with an atomic read–modify–write transaction. A failed save keeps the previous checkbox state and shows an error; tap the task again to retry. DataStore lives in the data layer; domain contracts and use cases remain plain Kotlin.
 
 ## Screenshots
 
@@ -54,14 +54,14 @@ UI callback → intent → serial processor → use case → repository
                             result → reducer → state → UI
 ```
 
-Both use a ViewModel for Android lifecycle ownership, `viewModelScope` for cancellation, and `collectAsStateWithLifecycle` for observation. MVI here has a single consumer and synchronously marks refresh as loading before queuing it, so repeated refreshes cannot enqueue extra requests. Accepted toggle intents are processed in order. Cancellation is rethrown rather than displayed as a load error in both versions.
+Both use a ViewModel for Android lifecycle ownership, `viewModelScope` for cancellation, and `collectAsStateWithLifecycle` for observation. MVI here has a single consumer and synchronously marks refresh as loading before queuing it, so repeated refreshes cannot enqueue extra requests. Toggle intents run a suspending persistence use case before producing a `Saved` result. Both implementations ignore additional actions while a load or save is pending. The reducer stays pure and only applies confirmed results. Cancellation is rethrown rather than displayed as a load error in both versions.
 
 An explicit reducer makes transitions easy to test and inspect, but introduces more types and ceremony. Direct MVVM action methods keep this small screen concise. Neither choice automatically guarantees clean architecture, good tests, or correct concurrency; those come from the implementation. This project is an educational comparison, not a claim that one pattern is universally better.
 
 ## Clean architecture boundaries
 
 ```text
-app/src/main/java/com/example/mvvmvsmvi/
+app/src/main/java/com/jiahaoliuliu/mvvmvsmvi/
 ├── domain/
 │   ├── entity/
 │   │   ├── Task.kt             # Task model
@@ -72,7 +72,8 @@ app/src/main/java/com/example/mvvmvsmvi/
 │       ├── LoadTasksUseCase.kt # Load use case
 │       └── ToggleTaskUseCase.kt # Toggle use case
 ├── data/
-│   └── FakeTaskRepository.kt   # Delayed, deterministic implementation
+│   ├── FakeTaskRepository.kt   # Fake catalog + persistent completion
+│   └── TaskCompletionStore.kt  # Preferences DataStore adapter and singleton
 └── presentation/
     ├── MainActivity.kt         # Architecture chooser / composition root
     ├── tasks/                  # Shared state and Compose UI
@@ -99,13 +100,13 @@ The Gradle wrapper is checked in. Use JDK 21 (the project emits Java 17-compatib
 
 On macOS, if needed, prefix a command with `JAVA_HOME=$(/usr/libexec/java_home -v 21)`.
 
-Unit tests cover both ViewModels through the same behavior contract: initial loading, toggling and unknown IDs, initial failure/retry, failed refresh with retained tasks, repeated input during loading, and cancellation on clearing the ViewModel. Separate tests exercise the domain use cases, fake failure sequence, instance isolation, and reducer transitions. Coroutine tests use virtual time, without wall-clock sleeps.
+Unit tests cover both ViewModels through the same behavior contract: initial loading, toggling and unknown IDs, initial failure/retry, failed refresh with retained tasks, repeated input during loading, and cancellation on clearing the ViewModel. Separate tests exercise the domain use cases, fake failure sequence, save failure/retry, persistence across reopening, atomic concurrent writes, and reducer transitions. Coroutine tests use virtual time, without wall-clock sleeps.
 
-Compose instrumentation tests launch **both real activities**, checking task completion, the deterministic refresh/error/retry sequence, and state/repository retention after activity recreation. Chooser tests verify the explanations, that each button opens the correct activity, and that the top back button returns to the chooser. They wait for observable UI conditions rather than using sleeps. Test assertions currently use the sample's English labels.
+Compose instrumentation tests launch **both real activities**, checking task completion, the deterministic refresh/error/retry sequence, and state/repository retention after activity recreation. Tests also close/reopen each activity and switch between MVVM and MVI to verify saved completion is shared. A test-only rule clears DataStore before activity launch to isolate scenarios. Chooser tests verify the explanations, that each button opens the correct activity, and that the top back button returns to the chooser. They wait for observable UI conditions rather than using sleeps. Test assertions currently use the sample's English labels.
 
 ### Verified locally
 
-On 3 October 2026, debug assembly and test APK assembly succeeded, all **17 unit tests** and **8 instrumentation tests** passed on an API 31 emulator, and `lintDebug` completed with **zero errors**. Lint reported eight advisory warnings: seven about newer dependency versions and one about targeting a newer Android API. Dependencies are pinned; this sample compiles and targets API 36. This is local validation, not a GitHub CI result.
+On 4 October 2026, debug assembly and test APK assembly succeeded, all **24 unit tests** and **11 instrumentation tests** passed on an API 31 emulator, and `lintDebug` completed with **zero errors**. Lint reported eight advisory warnings: seven about newer dependency versions and one about targeting a newer Android API. Dependencies are pinned; this sample compiles and targets API 36. A device check also saved a task in MVVM, force-stopped the app, and verified that MVI restored the completed task after relaunch. This is local validation, not a GitHub CI result.
 
 ## Ideas for your post
 
@@ -120,6 +121,7 @@ On 3 October 2026, debug assembly and test APK assembly succeeded, all **17 unit
 
 - [Android architecture recommendations](https://developer.android.com/topic/architecture/recommendations)
 - [UI layer and unidirectional data flow](https://developer.android.com/topic/architecture/ui-layer)
+- [Preferences DataStore](https://developer.android.com/topic/libraries/architecture/datastore)
 - [Compose testing](https://developer.android.com/develop/ui/compose/testing)
 - [AGP 8.13 release notes](https://developer.android.com/build/releases/agp-8-13-0-release-notes)
 

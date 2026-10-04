@@ -4,10 +4,10 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 android {
-    namespace = "com.example.mvvmvsmvi"
+    namespace = "com.jiahaoliuliu.mvvmvsmvi"
     compileSdk = 36
     defaultConfig {
-        applicationId = "com.example.mvvmvsmvi"
+        applicationId = "com.jiahaoliuliu.mvvmvsmvi"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -24,6 +24,7 @@ android {
 kotlin { jvmToolchain(21)
     compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17) } }
 dependencies {
+    implementation("androidx.datastore:datastore-preferences:1.2.1")
     implementation(platform("androidx.compose:compose-bom:2025.11.01"))
     implementation("androidx.activity:activity-compose:1.11.0")
     implementation("androidx.compose.material3:material3")
