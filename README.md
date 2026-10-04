@@ -1,8 +1,12 @@
 # MVVM vs MVI in Android
 
+![MVVM and MVI with shared Clean Architecture layers](docs/images/MVVM%20vs%20MVI.png)
+
 A small Kotlin / Jetpack Compose application for comparing **Model–View–ViewModel (MVVM)** with **Model–View–Intent (MVI)**. The launcher briefly explains both approaches and offers full-width buttons to choose an implementation. Both activities render the **same production composable**, use the same domain use cases and fake repository implementation, and offer identical behavior.
 
-The example is deliberately small enough to read alongside a blog post. No backend, credentials, dependency injection framework, or network permission is required. The app namespace and application ID are `com.jiahaoliuliu.mvvmvsmvi`.
+Read the accompanying article: **[Clean Architecture — MVVM vs. MVI](https://jiahaoliuliu.com/clean-architecture-mvvm-vs-mvi-a7a93af89ab6)**. It walks through both implementations and compares how they handle user actions and UI state transitions.
+
+The example is deliberately small enough to read alongside the article. No backend, credentials, dependency injection framework, or network permission is required. The app namespace and application ID are `com.jiahaoliuliu.mvvmvsmvi`.
 
 ## Try it
 
@@ -58,6 +62,22 @@ Both use a ViewModel for Android lifecycle ownership, `viewModelScope` for cance
 
 An explicit reducer makes transitions easy to test and inspect, but introduces more types and ceremony. Direct MVVM action methods keep this small screen concise. Neither choice automatically guarantees clean architecture, good tests, or correct concurrency; those come from the implementation. This project is an educational comparison, not a claim that one pattern is universally better.
 
+### Toggle sequence diagrams
+
+Both diagrams show a successful task toggle. The repository persists the completion change in DataStore before the UI displays the confirmed value.
+
+#### MVVM
+
+The ViewModel's `toggle(id)` method coordinates the operation and updates the UI state directly.
+
+![Numbered MVVM task toggle sequence diagram](docs/images/MVVM%20sequential%20chart.png)
+
+#### MVI
+
+The ViewModel accepts a `TasksIntent.Toggle`, processes it, and passes progress and completion results to `TasksReducer`. The reducer applies the already-toggled task to the UI state.
+
+![Numbered MVI task toggle sequence diagram](docs/images/MVVI%20Sequential%20chart.png)
+
 ## Clean architecture boundaries
 
 ```text
@@ -107,15 +127,6 @@ Compose instrumentation tests launch **both real activities**, checking task com
 ### Verified locally
 
 On 4 October 2026, debug assembly and test APK assembly succeeded, **15 instrumentation tests** passed on an API 31 emulator. After extracting `TasksReducer`, debug and UI-test APK assembly succeeded and all **25 unit tests** passed, and `lintDebug` completed with **zero errors**. Lint reported eight advisory warnings: seven about newer dependency versions and one about targeting a newer Android API. Dependencies are pinned; this sample compiles and targets API 36. A device check also saved a task in MVVM, force-stopped the app, and verified that MVI restored the completed task after relaunch. This is local validation, not a GitHub CI result.
-
-## Ideas for your post
-
-- Start with the identical UI behavior, then show the action entry points side by side.
-- Trace one refresh through each implementation and compare where state changes occur.
-- Show failure/retry and cancellation: architecture names alone do not solve these cases.
-- Compare a ViewModel behavior test with a pure reducer test.
-- Explain why modern MVVM and MVI overlap in unidirectional state flow.
-- Discuss the extra ceremony versus explicit transitions as a tradeoff, rather than declaring a winner.
 
 ## References
 
