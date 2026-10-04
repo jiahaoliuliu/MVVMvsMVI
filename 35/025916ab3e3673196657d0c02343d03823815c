@@ -1,0 +1,21 @@
+README.md
+  s_ed2cef3c00f83c::t_02c671e541ec92 3-4,7-9,65-80
+docs/mvvm-vs-mvi-article.md
+  s_ed2cef3c00f83c::t_e31bdd16d90b05 1-267
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "35025916ab3e3673196657d0c02343d03823815c",
+  "prompts": {},
+  "sessions": {
+    "s_ed2cef3c00f83c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a10154-c5af-76f3-b552-64405031152a",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jiahao Liu Liu <jiahaoliuliu@gmail.com>"
+    }
+  }
+}
