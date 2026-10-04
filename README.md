@@ -12,9 +12,9 @@ The example is deliberately small enough to read alongside a blog post. No backe
 4. Choose **Open MVVM** or **Open MVI**.
 5. Toggle a task, refresh, and compare the code handling those actions.
 
-Each activity owns a fresh fake repository, retained by its ViewModel across configuration changes. Load 1 succeeds automatically, load 2 succeeds on refresh, and load 3 fails. **Retry** runs load 4 and succeeds. Every third load fails. Failed refreshes retain the existing tasks; successful refreshes reload the catalog with completion restored from DataStore. Task toggles and refresh are disabled while loading or saving. Loading displays the indicator and text centered between the subtitle and Refresh. Refresh is pinned to the bottom above the system navigation area; the task content scrolls independently. The top back button and System Back return to the chooser.
+Each activity owns a fresh fake repository, retained by its ViewModel across configuration changes. Load 1 succeeds automatically, load 2 succeeds on refresh, and load 3 fails. **Retry** runs load 4 and succeeds. Every third load fails. Failed refreshes retain the existing tasks; successful refreshes reload the catalog with completion restored from DataStore. Task toggles and refresh are disabled while loading or toggling. Loading displays the indicator and text centered between the subtitle and Refresh. Refresh is pinned to the bottom above the system navigation area; the task content scrolls independently. The top back button and System Back return to the chooser.
 
-Task completion is stored in **Preferences DataStore**, shared by both architectures. Confirmed choices survive activity reopening and app/process restarts. Only the fake load counter resets when reopening a screen. The repository stores completed task IDs with an atomic read–modify–write transaction. During a save, control colors and list positions stay stable; the saving status is exposed through accessibility semantics instead of inserting a temporary text row. A failed save keeps the previous checkbox state and shows an error; tap the task again to retry. DataStore lives in the data layer; domain contracts and use cases remain plain Kotlin.
+Task completion is stored in **Preferences DataStore**, shared by both architectures. Confirmed choices survive activity reopening and app/process restarts. Only the fake load counter resets when reopening a screen. The repository stores completed task IDs with an atomic read–modify–write transaction. During a toggle, control colors and list positions stay stable; the toggling status is exposed through accessibility semantics instead of inserting a temporary text row. A failed toggle keeps the previous checkbox state and shows an error; tap the task again to retry. DataStore lives in the data layer; domain contracts and use cases remain plain Kotlin.
 
 ## Screenshots
 
@@ -31,7 +31,7 @@ Captured from the real activities on an Android 12 / API 31 emulator.
 | UI entry points | `refresh()` and `toggle(id)` methods | `accept(TasksIntent)` |
 | Action representation | Method calls | Explicit sealed intents: `Refresh`, `Toggle` |
 | Asynchronous work | ViewModel methods launch work | A single intent consumer processes work serially |
-| State transitions | ViewModel updates `TasksState` directly | Results pass through the pure `reduce(state, result)` function |
+| State transitions | ViewModel updates `TasksState` directly | Results pass through the pure `TasksReducer.reduce(state, result)` method |
 | Rendered state | Read-only `StateFlow<TasksState>` | Read-only `StateFlow<TasksState>` |
 | Rendering | Shared `TasksScreen` | Shared `TasksScreen` |
 | Tests | Observable behavior contract | Same contract, plus reducer tests |
@@ -54,7 +54,7 @@ UI callback → intent → serial processor → use case → repository
                             result → reducer → state → UI
 ```
 
-Both use a ViewModel for Android lifecycle ownership, `viewModelScope` for cancellation, and `collectAsStateWithLifecycle` for observation. MVI here has a single consumer and synchronously marks refresh as loading before queuing it, so repeated refreshes cannot enqueue extra requests. Toggle intents run a suspending persistence use case before producing a `Saved` result. Both implementations ignore additional actions while a load or save is pending. The reducer stays pure and only applies confirmed results. Cancellation is rethrown rather than displayed as a load error in both versions.
+Both use a ViewModel for Android lifecycle ownership, `viewModelScope` for cancellation, and `collectAsStateWithLifecycle` for observation. MVI here has a single consumer and synchronously marks refresh as loading before queuing it, so repeated refreshes cannot enqueue extra requests. Toggle intents run a suspending persistence use case before producing a `Toggled` result. Both implementations ignore additional actions while a load or toggle is pending. `TasksReducer.kt` groups the result types and UI transitions. Its `applyToggledTask` method replaces the UI snapshot with the task already updated by the use case; it never flips completion or writes DataStore. The reducer stays pure and only applies confirmed results. Cancellation is rethrown rather than displayed as a load error in both versions.
 
 An explicit reducer makes transitions easy to test and inspect, but introduces more types and ceremony. Direct MVVM action methods keep this small screen concise. Neither choice automatically guarantees clean architecture, good tests, or correct concurrency; those come from the implementation. This project is an educational comparison, not a claim that one pattern is universally better.
 
@@ -78,7 +78,7 @@ app/src/main/java/com/jiahaoliuliu/mvvmvsmvi/
     ├── MainActivity.kt         # Architecture chooser / composition root
     ├── tasks/                  # Shared state and Compose UI
     ├── mvvm/                   # Activity + ViewModel with action methods
-    └── mvi/                    # Activity + intents, results, reducer, ViewModel
+    └── mvi/                    # Activity + intents, ViewModel, TasksReducer/results
 ```
 
 `domain` contains plain Kotlin and does not depend on Android, Compose, or `data`. `data` implements the domain contract. `presentation` depends on domain use cases; activity factories wire in the fake implementation at the composition boundary. Resource lookup and localized task labels belong to presentation, while stable task identifiers and title keys belong to domain.
@@ -100,13 +100,13 @@ The Gradle wrapper is checked in. Use JDK 21 (the project emits Java 17-compatib
 
 On macOS, if needed, prefix a command with `JAVA_HOME=$(/usr/libexec/java_home -v 21)`.
 
-Unit tests cover both ViewModels through the same behavior contract: initial loading, toggling and unknown IDs, initial failure/retry, failed refresh with retained tasks, repeated input during loading, and cancellation on clearing the ViewModel. Separate tests exercise the domain use cases, fake failure sequence, save failure/retry, persistence across reopening, atomic concurrent writes, and reducer transitions. Coroutine tests use virtual time, without wall-clock sleeps.
+Unit tests cover both ViewModels through the same behavior contract: initial loading, toggling and unknown IDs, initial failure/retry, failed refresh with retained tasks, repeated input during loading, and cancellation on clearing the ViewModel. Separate tests exercise the domain use cases, fake failure sequence, toggle failure/retry, persistence across reopening, atomic concurrent writes, and reducer transitions. Coroutine tests use virtual time, without wall-clock sleeps.
 
-Compose instrumentation tests launch **both real activities**, checking task completion, the deterministic refresh/error/retry sequence, and state/repository retention after activity recreation. Tests also close/reopen each activity and switch between MVVM and MVI to verify saved completion is shared. A test-only rule clears DataStore before activity launch to isolate scenarios. Chooser tests verify the explanations, that each button opens the correct activity, and that the top back button returns to the chooser. They wait for observable UI conditions rather than using sleeps. Layout tests additionally verify that Refresh stays below the scrolling viewport for an empty list and remains in the same position while a 100-item list scrolls. A save-transition regression test checks that task rows and Refresh do not move during saving and that saving remains accessible without a temporary text row. Test assertions currently use the sample's English labels.
+Compose instrumentation tests launch **both real activities**, checking task completion, the deterministic refresh/error/retry sequence, and state/repository retention after activity recreation. Tests also close/reopen each activity and switch between MVVM and MVI to verify saved completion is shared. A test-only rule clears DataStore before activity launch to isolate scenarios. Chooser tests verify the explanations, that each button opens the correct activity, and that the top back button returns to the chooser. They wait for observable UI conditions rather than using sleeps. Layout tests additionally verify that Refresh stays below the scrolling viewport for an empty list and remains in the same position while a 100-item list scrolls. A toggle-transition regression test checks that task rows and Refresh do not move during toggling and that toggling remains accessible without a temporary text row. Test assertions currently use the sample's English labels.
 
 ### Verified locally
 
-On 4 October 2026, debug assembly and test APK assembly succeeded, all **24 unit tests** and **15 instrumentation tests** passed on an API 31 emulator, and `lintDebug` completed with **zero errors**. Lint reported eight advisory warnings: seven about newer dependency versions and one about targeting a newer Android API. Dependencies are pinned; this sample compiles and targets API 36. A device check also saved a task in MVVM, force-stopped the app, and verified that MVI restored the completed task after relaunch. This is local validation, not a GitHub CI result.
+On 4 October 2026, debug assembly and test APK assembly succeeded, **15 instrumentation tests** passed on an API 31 emulator. After extracting `TasksReducer`, debug and UI-test APK assembly succeeded and all **25 unit tests** passed, and `lintDebug` completed with **zero errors**. Lint reported eight advisory warnings: seven about newer dependency versions and one about targeting a newer Android API. Dependencies are pinned; this sample compiles and targets API 36. A device check also saved a task in MVVM, force-stopped the app, and verified that MVI restored the completed task after relaunch. This is local validation, not a GitHub CI result.
 
 ## Ideas for your post
 

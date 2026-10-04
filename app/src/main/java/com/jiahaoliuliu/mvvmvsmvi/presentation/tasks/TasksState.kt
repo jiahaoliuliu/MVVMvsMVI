@@ -6,6 +6,6 @@ data class TasksState(
     val tasks: List<Task> = emptyList(),
     val isLoading: Boolean = false,
     val hasError: Boolean = false,
-    val isSaving: Boolean = false,
-    val hasSaveError: Boolean = false,
+    val isToggling: Boolean = false,
+    val hasToggleError: Boolean = false,
 )

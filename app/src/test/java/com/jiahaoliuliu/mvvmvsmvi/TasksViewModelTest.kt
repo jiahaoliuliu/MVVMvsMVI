@@ -23,6 +23,7 @@ import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import java.io.IOException
+import kotlin.time.Duration.Companion.milliseconds
 
 /** Run the same behavior contract against both architectures. */
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -118,29 +119,29 @@ abstract class TasksViewModelContract {
         assertTrue(model.state.value.tasks.isEmpty())
     }
 
-    @Test fun failedSaveKeepsCompletionAndRetryPersists() = runTest {
+    @Test fun failedToggleKeepsCompletionAndRetryPersists() = runTest {
         val repository = ControlledRepository()
         val model = create(repository)
         advanceUntilIdle()
-        repository.failSave = true
+        repository.failToggle = true
         model.toggle("one")
-        assertTrue(model.state.value.isSaving)
+        assertTrue(model.state.value.isToggling)
         assertFalse(model.state.value.tasks.first().completed)
         advanceUntilIdle()
-        assertTrue(model.state.value.hasSaveError)
-        assertFalse(model.state.value.isSaving)
+        assertTrue(model.state.value.hasToggleError)
+        assertFalse(model.state.value.isToggling)
         assertFalse(model.state.value.tasks.first().completed)
-        repository.failSave = false
+        repository.failToggle = false
         model.toggle("one")
         advanceUntilIdle()
         assertTrue(model.state.value.tasks.first().completed)
-        assertFalse(model.state.value.hasSaveError)
+        assertFalse(model.state.value.hasToggleError)
         model.refresh()
         advanceUntilIdle()
         assertTrue(model.state.value.tasks.first().completed)
     }
 
-    @Test fun repeatedInputDuringSaveIsIgnored() = runTest {
+    @Test fun repeatedInputDuringToggleIsIgnored() = runTest {
         val repository = ControlledRepository()
         val model = create(repository)
         advanceUntilIdle()
@@ -148,7 +149,7 @@ abstract class TasksViewModelContract {
         model.toggle("one")
         model.refresh()
         advanceUntilIdle()
-        assertEquals(1, repository.saves)
+        assertEquals(1, repository.toggles)
         assertEquals(1, repository.calls)
         assertTrue(model.state.value.tasks.first().completed)
     }
@@ -157,19 +158,19 @@ abstract class TasksViewModelContract {
 
     private class ControlledRepository : TaskRepository {
         var tasks = listOf(Task("one", TaskTitle.COMPOSE), Task("two", TaskTitle.TESTS))
-        var failSave = false
-        var saves = 0
+        var failToggle = false
+        var toggles = 0
         var calls = 0
         var fail = false
         var cancelled = false
         override suspend fun toggleTask(id: String): Task? {
-            saves++
-            delay(100)
-            if (failSave) throw IOException("write failed")
+            toggles++
+            delay(100.milliseconds)
+            if (failToggle) throw IOException("write failed")
             val task = tasks.find { it.id == id } ?: return null
-            val saved = task.copy(completed = !task.completed)
-            tasks = tasks.map { if (it.id == id) saved else it }
-            return saved
+            val toggled = task.copy(completed = !task.completed)
+            tasks = tasks.map { if (it.id == id) toggled else it }
+            return toggled
         }
         override suspend fun loadTasks(): List<Task> {
             calls++

@@ -28,7 +28,7 @@ fun TasksScreen(
     onToggle: (String) -> Unit,
     onBack: () -> Unit,
 ) {
-    val savingLabel = stringResource(R.string.saving)
+    val togglingLabel = stringResource(R.string.toggling)
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             Modifier
@@ -88,9 +88,9 @@ fun TasksScreen(
                                     state.tasks.size
                                 )
                             )
-                            if (state.hasSaveError) {
+                            if (state.hasToggleError) {
                                 Text(
-                                    stringResource(R.string.save_error),
+                                    stringResource(R.string.toggle_error),
                                     color = MaterialTheme.colorScheme.error
                                 )
                             }
@@ -113,12 +113,12 @@ fun TasksScreen(
                                     .fillMaxWidth()
                                     .toggleable(
                                         value = task.completed,
-                                        enabled = !state.isLoading && !state.isSaving,
+                                        enabled = !state.isLoading && !state.isToggling,
                                         role = Role.Checkbox,
                                         onValueChange = { onToggle(task.id) },
                                     )
                                     .semantics {
-                                        if (state.isSaving) stateDescription = savingLabel
+                                        if (state.isToggling) stateDescription = togglingLabel
                                     }
                                     .padding(12.dp),
                                 verticalAlignment = Alignment.CenterVertically,
@@ -126,7 +126,7 @@ fun TasksScreen(
                                 Checkbox(
                                     checked = task.completed,
                                     onCheckedChange = null,
-                                    enabled = !state.isLoading && !state.isSaving,
+                                    enabled = !state.isLoading && !state.isToggling,
                                     colors = if (state.isLoading) CheckboxDefaults.colors() else CheckboxDefaults.colors(
                                         disabledCheckedColor = MaterialTheme.colorScheme.primary,
                                         disabledUncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -143,7 +143,7 @@ fun TasksScreen(
             Button(
                 onClick = onRefresh,
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !state.isLoading && !state.isSaving,
+                enabled = !state.isLoading && !state.isToggling,
                 colors = if (state.isLoading) ButtonDefaults.buttonColors() else ButtonDefaults.buttonColors(
                     disabledContainerColor = MaterialTheme.colorScheme.primary,
                     disabledContentColor = MaterialTheme.colorScheme.onPrimary,

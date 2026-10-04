@@ -34,22 +34,22 @@ class TasksScreenLayoutTest {
         assertTrue(button.top >= viewport.bottom)
     }
 
-    @Test fun savingDoesNotShiftTasksOrRefresh() {
+    @Test fun togglingDoesNotShiftTasksOrRefresh() {
         val state = mutableStateOf(TasksState(tasks = listOf(Task("compose", TaskTitle.COMPOSE))))
         compose.setContent {
             MaterialTheme { TasksScreen(state.value, {}, {}, {}) }
         }
         val taskBefore = compose.onNodeWithText("Learn Jetpack Compose").fetchSemanticsNode().boundsInRoot
         val refreshBefore = compose.onNodeWithText("Refresh").fetchSemanticsNode().boundsInRoot
-        compose.runOnIdle { state.value = state.value.copy(isSaving = true) }
+        compose.runOnIdle { state.value = state.value.copy(isToggling = true) }
         compose.onNodeWithText("Learn Jetpack Compose").assertIsNotEnabled()
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "Saving task"))
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "Toggling task"))
         compose.onNodeWithText("Refresh").assertIsNotEnabled()
-        compose.onNodeWithText("Saving task").assertDoesNotExist()
+        compose.onNodeWithText("Toggling task").assertDoesNotExist()
         assertEquals(taskBefore, compose.onNodeWithText("Learn Jetpack Compose").fetchSemanticsNode().boundsInRoot)
         assertEquals(refreshBefore, compose.onNodeWithText("Refresh").fetchSemanticsNode().boundsInRoot)
         compose.runOnIdle {
-            state.value = state.value.copy(isSaving = false, tasks = state.value.tasks.map { it.copy(completed = true) })
+            state.value = state.value.copy(isToggling = false, tasks = state.value.tasks.map { it.copy(completed = true) })
         }
         compose.onNodeWithText("Learn Jetpack Compose").assertIsOn().assertIsEnabled()
         assertEquals(taskBefore, compose.onNodeWithText("Learn Jetpack Compose").fetchSemanticsNode().boundsInRoot)

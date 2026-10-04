@@ -23,8 +23,8 @@ class MvvmViewModel(
     }
 
     fun refresh() {
-        if (state.value.isLoading || state.value.isSaving) return
-        mutableState.update { it.copy(isLoading = true, hasError = false, hasSaveError = false) }
+        if (state.value.isLoading || state.value.isToggling) return
+        mutableState.update { it.copy(isLoading = true, hasError = false, hasToggleError = false) }
         viewModelScope.launch {
             try {
                 val tasks = loadTaskUseCase()
@@ -38,20 +38,20 @@ class MvvmViewModel(
     }
 
     fun toggle(id: String) {
-        if (state.value.isLoading || state.value.isSaving) return
-        mutableState.update { it.copy(isSaving = true, hasSaveError = false) }
+        if (state.value.isLoading || state.value.isToggling) return
+        mutableState.update { it.copy(isToggling = true, hasToggleError = false) }
         viewModelScope.launch {
             try {
-                val saved = toggleTaskUseCase(id)
+                val toggled = toggleTaskUseCase(id)
                 mutableState.update { state ->
                     state.copy(
-                        isSaving = false,
-                        tasks = state.tasks.map { if (saved != null && it.id == saved.id) saved else it })
+                        isToggling = false,
+                        tasks = state.tasks.map { if (toggled != null && it.id == toggled.id) toggled else it })
                 }
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (_: Exception) {
-                mutableState.update { it.copy(isSaving = false, hasSaveError = true) }
+                mutableState.update { it.copy(isToggling = false, hasToggleError = true) }
             }
         }
     }
