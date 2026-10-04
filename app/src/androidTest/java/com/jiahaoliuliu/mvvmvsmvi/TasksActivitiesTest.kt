@@ -3,6 +3,7 @@ package com.jiahaoliuliu.mvvmvsmvi
 import androidx.activity.ComponentActivity
 import androidx.test.core.app.ActivityScenario
 import androidx.compose.ui.test.*
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import com.jiahaoliuliu.mvvmvsmvi.presentation.mvi.MviActivity
 import com.jiahaoliuliu.mvvmvsmvi.presentation.mvvm.MvvmActivity
@@ -18,7 +19,9 @@ abstract class TasksActivityContract<A : ComponentActivity>(private val activity
     private fun awaitReady() {
         compose.waitUntil(5_000) {
             compose.onAllNodesWithText("Loading tasks").fetchSemanticsNodes().isEmpty() &&
-                compose.onAllNodesWithText("Saving task").fetchSemanticsNodes().isEmpty()
+                compose.onAllNodesWithText("Refresh").fetchSemanticsNodes().singleOrNull()?.let {
+                    !it.config.contains(SemanticsProperties.Disabled)
+                } == true
         }
     }
 

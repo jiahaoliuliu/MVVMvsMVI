@@ -2,6 +2,7 @@ package com.jiahaoliuliu.mvvmvsmvi
 
 import android.app.Activity
 import androidx.compose.ui.test.*
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
 import androidx.test.runner.lifecycle.Stage
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -42,7 +43,9 @@ class MainActivityTest {
         compose.waitUntil(5_000) {
             compose.onAllNodesWithText("Learn Jetpack Compose").fetchSemanticsNodes().isNotEmpty() &&
                 compose.onAllNodesWithText("Loading tasks").fetchSemanticsNodes().isEmpty() &&
-                compose.onAllNodesWithText("Saving task").fetchSemanticsNodes().isEmpty()
+                compose.onAllNodesWithText("Refresh").fetchSemanticsNodes().singleOrNull()?.let {
+                    !it.config.contains(SemanticsProperties.Disabled)
+                } == true
         }
     }
 

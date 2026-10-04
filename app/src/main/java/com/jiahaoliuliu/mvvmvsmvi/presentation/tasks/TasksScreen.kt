@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
@@ -27,6 +28,7 @@ fun TasksScreen(
     onToggle: (String) -> Unit,
     onBack: () -> Unit,
 ) {
+    val savingLabel = stringResource(R.string.saving)
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(Modifier.safeDrawingPadding().padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -35,40 +37,82 @@ fun TasksScreen(
                 }
                 Text(stringResource(R.string.tasks_title), style = MaterialTheme.typography.headlineLarge)
             }
-            Text(stringResource(R.string.demo_hint), style = MaterialTheme.typography.bodyMedium)
-            Text(stringResource(R.string.completed_count, state.tasks.count { it.completed }, state.tasks.size))
-            Button(onClick = onRefresh, modifier = Modifier.fillMaxWidth(), enabled = !state.isLoading && !state.isSaving) { Text(stringResource(R.string.refresh)) }
+            Text(
+                stringResource(R.string.demo_hint),
+                modifier = Modifier.testTag("tasks_subtitle"),
+                style = MaterialTheme.typography.bodyMedium,
+            )
             if (state.isLoading) {
-                val loading = stringResource(R.string.loading)
-                CircularProgressIndicator(Modifier.semantics { stateDescription = loading })
-                Text(loading)
-            }
-            if (state.isSaving) Text(stringResource(R.string.saving))
-            if (state.hasSaveError) {
-                Text(stringResource(R.string.save_error), color = MaterialTheme.colorScheme.error)
-            }
-            if (state.hasError) {
-                Text(stringResource(R.string.load_error), color = MaterialTheme.colorScheme.error)
-                Button(onClick = onRefresh, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.retry)) }
-            }
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(state.tasks, key = { it.id }) { task ->
-                    Card {
-                        Row(
-                            Modifier.fillMaxWidth().toggleable(
-                                value = task.completed,
-                                enabled = !state.isLoading && !state.isSaving,
-                                role = Role.Checkbox,
-                                onValueChange = { onToggle(task.id) },
-                            ).padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Checkbox(checked = task.completed, onCheckedChange = null, enabled = !state.isLoading && !state.isSaving)
-                            Text(stringResource(task.title.resourceId()), Modifier.weight(1f))
+                Box(
+                    modifier = Modifier.weight(1f).fillMaxWidth().testTag("loading_area"),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    val loading = stringResource(R.string.loading)
+                    Column(
+                        modifier = Modifier.testTag("loading_content"),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                    ) {
+                        CircularProgressIndicator(Modifier.semantics { stateDescription = loading })
+                        Text(loading)
+                    }
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.weight(1f).fillMaxWidth().testTag("tasks_list"),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    item {
+                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                            Text(stringResource(R.string.completed_count, state.tasks.count { it.completed }, state.tasks.size))
+                            if (state.hasSaveError) {
+                                Text(stringResource(R.string.save_error), color = MaterialTheme.colorScheme.error)
+                            }
+                            if (state.hasError) {
+                                Text(stringResource(R.string.load_error), color = MaterialTheme.colorScheme.error)
+                                Button(onClick = onRefresh, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.retry)) }
+                            }
+                        }
+                    }
+                    items(state.tasks, key = { it.id }) { task ->
+                        Card {
+                            Row(
+                                Modifier.fillMaxWidth().toggleable(
+                                    value = task.completed,
+                                    enabled = !state.isLoading && !state.isSaving,
+                                    role = Role.Checkbox,
+                                    onValueChange = { onToggle(task.id) },
+                                ).semantics {
+                                    if (state.isSaving) stateDescription = savingLabel
+                                }.padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Checkbox(
+                                    checked = task.completed,
+                                    onCheckedChange = null,
+                                    enabled = !state.isLoading && !state.isSaving,
+                                    colors = if (state.isLoading) CheckboxDefaults.colors() else CheckboxDefaults.colors(
+                                        disabledCheckedColor = MaterialTheme.colorScheme.primary,
+                                        disabledUncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        disabledIndeterminateColor = MaterialTheme.colorScheme.primary,
+                                    ),
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text(stringResource(task.title.resourceId()), Modifier.weight(1f))
+                            }
                         }
                     }
                 }
             }
+            Button(
+                onClick = onRefresh,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !state.isLoading && !state.isSaving,
+                colors = if (state.isLoading) ButtonDefaults.buttonColors() else ButtonDefaults.buttonColors(
+                    disabledContainerColor = MaterialTheme.colorScheme.primary,
+                    disabledContentColor = MaterialTheme.colorScheme.onPrimary,
+                ),
+            ) { Text(stringResource(R.string.refresh)) }
         }
     }
 }
