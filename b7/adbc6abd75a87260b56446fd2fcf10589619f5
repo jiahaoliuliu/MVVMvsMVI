@@ -1,0 +1,30 @@
+app/src/main/java/com/jiahaoliuliu/mvvmvsmvi/presentation/tasks/TasksScreen.kt
+  s_ed2cef3c00f83c::t_94be63800d57f1 100
+  s_ed2cef3c00f83c::t_bf16040ade5383 12,31,40-44,46-99,101-102,107-115
+README.md
+  s_ed2cef3c00f83c::t_4bef8fd2ac0d1d 105
+  s_ed2cef3c00f83c::t_a5b966cb1b3566 17
+  s_ed2cef3c00f83c::t_360fd1bb7d26a1 15,109
+app/src/androidTest/java/com/jiahaoliuliu/mvvmvsmvi/MainActivityTest.kt
+  s_ed2cef3c00f83c::t_4b2ec711ea21ec 5,46-48
+app/src/androidTest/java/com/jiahaoliuliu/mvvmvsmvi/TasksActivitiesTest.kt
+  s_ed2cef3c00f83c::t_3ca4c421e6d2df 6,22-24
+app/src/androidTest/java/com/jiahaoliuliu/mvvmvsmvi/TasksScreenLayoutTest.kt
+  s_ed2cef3c00f83c::t_160a8e94e58504 1-92
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "b7adbc6abd75a87260b56446fd2fcf10589619f5",
+  "prompts": {},
+  "sessions": {
+    "s_ed2cef3c00f83c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a10154-c5af-76f3-b552-64405031152a",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jiahao Liu Liu <jiahaoliuliu@gmail.com>"
+    }
+  }
+}
